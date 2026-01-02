@@ -7,12 +7,6 @@ namespace Cupl.Enumerables
 {
 	public static class CollectionUtils
 	{
-		[return: MaybeNull]
-		public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key)
-		{
-			return source.TryGetValue(key, out var value) ? value : default;
-		}
-
 		public static TValue? GetValueOrNull<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> source, TKey key)
 			where TValue : struct
 		{
