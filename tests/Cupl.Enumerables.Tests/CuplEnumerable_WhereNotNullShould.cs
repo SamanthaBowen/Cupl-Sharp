@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Cupl.Linq;
+using Cupl.Enumerables;
 
-namespace Cupl.Linq.Tests
+namespace Cupl.Enumerables.Tests
 {
 	public class CuplEnumerable_WhereNotNullShould
 	{

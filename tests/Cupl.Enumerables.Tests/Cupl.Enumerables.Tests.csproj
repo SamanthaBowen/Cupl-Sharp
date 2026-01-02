@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Cupl.Linq\Cupl.Linq.csproj" />
+    <ProjectReference Include="..\..\src\Cupl.Enumerables\Cupl.Enumerables.csproj" />
   </ItemGroup>
 
 </Project>

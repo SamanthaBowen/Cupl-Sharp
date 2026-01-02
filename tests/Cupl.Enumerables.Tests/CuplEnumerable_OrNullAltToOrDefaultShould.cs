@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using Cupl.Linq;
+using Cupl.Enumerables;
 
-namespace Cupl.Linq.Tests
+namespace Cupl.Enumerables.Tests
 {
-	public class CuplEnumerable_OrNullAltToOrDefault
+	public class CuplEnumerable_OrNullAltToOrDefaultShould
 	{
 		private static IEnumerable<IEnumerable<int>> GetNonnullValueTypeDataTestCases()
 		{
@@ -15,7 +15,7 @@ namespace Cupl.Linq.Tests
 			yield return fullData.Where(x => x % 2 == 1);
 		}
 
-		public CuplEnumerable_OrNullAltToOrDefault()
+		public CuplEnumerable_OrNullAltToOrDefaultShould()
 		{
 		}
 
