@@ -3,7 +3,7 @@ using Cupl.Enumerables;
 
 namespace Cupl.Enumerables.Tests
 {
-	public class CuplEnumerable_OrNullAltToOrDefaultShould
+	public class EnumerableUtils_OrNullAltToOrDefaultShould
 	{
 		private static IEnumerable<IEnumerable<int>> GetNonnullValueTypeDataTestCases()
 		{
@@ -15,7 +15,7 @@ namespace Cupl.Enumerables.Tests
 			yield return fullData.Where(x => x % 2 == 1);
 		}
 
-		public CuplEnumerable_OrNullAltToOrDefaultShould()
+		public EnumerableUtils_OrNullAltToOrDefaultShould()
 		{
 		}
 

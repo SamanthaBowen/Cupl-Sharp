@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Cupl.Enumerables
 {
-	public static partial class CuplEnumerable
+	public static partial class EnumerableUtils
 	{
 		public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
 			where T : class

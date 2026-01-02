@@ -3,7 +3,7 @@ using Cupl.Enumerables;
 
 namespace Cupl.Enumerables.Tests
 {
-	public class CuplEnumerable_WhereNotNullShould
+	public class EnumerableUtils_WhereNotNullShould
 	{
 		[SetUp]
 		public void Setup()
