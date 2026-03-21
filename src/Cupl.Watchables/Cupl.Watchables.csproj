@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Description>Cupl.Watchables is a Cupl library providing watchable types for observing value changes.</Description>
+    <Authors>Samantha Bowen</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+  </PropertyGroup>
+
+</Project>

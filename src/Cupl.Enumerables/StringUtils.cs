@@ -7,6 +7,14 @@ namespace Cupl.Enumerables
 {
 	public static class StringUtils
 	{
+		public static string? NullIfEmpty(this string str)
+		{
+			if (str == string.Empty)
+				return null;
+			else
+				return str;
+		}
+
 		public static int? IndexOfOrNull(this string str, char value)
 		{
 			var index = str.IndexOf(value);
