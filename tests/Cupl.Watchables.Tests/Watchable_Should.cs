@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Cupl.Watchables;
@@ -103,7 +104,7 @@ public class Watchable_Should
 	}
 
 	[Test]
-	public void TestWatchMany()
+	public void TestWatchManyEnumerable()
 	{
 		WatchableMutable<int>[] arrayWatchables = Enumerable.Range(0, 8).Select(i => new WatchableMutable<int>(i)).ToArray();
 		
@@ -148,5 +149,30 @@ public class Watchable_Should
 		Assert.That(watchableEnumerable, Is.EquivalentTo([5, 6, 7]));
 		Assert.That(mutableEnumerableRan.Value);
 		mutableEnumerableRan.Value = false;
+	}
+
+	[Test]
+	public void TestWatchManyTuple()
+	{
+		WatchableMutable<int> watchable1 = new(0);
+		WatchableMutable<string> watchable2 = new("ABC");
+		var ran = new Mutable<bool>(false);
+
+		var watchableTuple = (watchable1, watchable2).WatchMany();
+		watchableTuple.ValueChanged +=
+			tuple =>
+			{
+				Assert.That(tuple.Item1, Is.EqualTo(watchable1.Value));
+				Assert.That(tuple.Item2, Is.EqualTo(watchable2.Value));
+				ran.Value = true;
+			};
+
+		watchable1.Value = 42;
+		Assert.That(ran.Value);
+		ran.Value = false;
+
+		watchable2.Value = "xyz";
+		Assert.That(ran.Value);
+		ran.Value = false;
 	}
 }

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Cupl.Watchables
 {
-	internal struct WatchableSequence<T> :
+	internal readonly struct WatchableSequence<T> :
 		IWatchableEnumerable<T>
 	{
 		public event Action<IEnumerable<T>>? ValueChanged
@@ -35,10 +35,11 @@ namespace Cupl.Watchables
 
 		private readonly Action<T> GetElementValueChangedHandler(Action<IEnumerable<T>>? handler)
 		{
-			var value = Value;
+			// Making a copy is okay because this is readonly.
+			var this_ = this;
 
 			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(value);
+			return s => handler?.Invoke(this_.Value);
 		}
 
 		public IEnumerator<T> GetEnumerator() => Value.GetEnumerator();
