@@ -12,9 +12,19 @@ namespace Cupl.Watchables
 			return new MappedWatchable<TSource, TResult>(source, selector);
 		}
 
-		public static IWatchable<TResult> Map<T0, T1, TResult>(this IWatchable<(T0, T1)> source, Func<T0, T1, TResult> selector)
+		public static IWatchable<TResult> Map<T1, T2, TResult>(this IWatchable<(T1, T2)> source, Func<T1, T2, TResult> selector)
 		{
 			return source.Map(tuple => selector(tuple.Item1, tuple.Item2));
+		}
+
+		public static IWatchable<TResult> Map<T1, T2, T3, TResult>(this IWatchable<(T1, T2, T3)> source, Func<T1, T2, T3, TResult> selector)
+		{
+			return source.Map(tuple => selector(tuple.Item1, tuple.Item2, tuple.Item3));
+		}
+
+		public static IWatchable<TResult> Map<T1, T2, T3, T4, TResult>(this IWatchable<(T1, T2, T3, T4)> source, Func<T1, T2, T3, T4, TResult> selector)
+		{
+			return source.Map(tuple => selector(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4));
 		}
 
 		public static IWatchable<T> Unwrap<T>(this IWatchable<IWatchable<T>> watchable)
@@ -35,9 +45,19 @@ namespace Cupl.Watchables
 			return watchables.Map(e => e.WatchMany()).Unwrap().ToWatchableEnumerable();
 		}
 
-		public static IWatchable<(T0, T1)> WatchMany<T0, T1>(this (IWatchable<T0>, IWatchable<T1>) tuple)
+		public static IWatchable<(T1, T2)> WatchMany<T1, T2>(this (IWatchable<T1>, IWatchable<T2>) tuple)
 		{
-			return new WatchableTuple<T0, T1>(tuple.Item1, tuple.Item2);
+			return new WatchableTuple<T1, T2>(tuple.Item1, tuple.Item2);
+		}
+
+		public static IWatchable<(T1, T2, T3)> WatchMany<T1, T2, T3>(this (IWatchable<T1>, IWatchable<T2>, IWatchable<T3>) tuple)
+		{
+			return new WatchableTuple<T1, T2, T3>(tuple.Item1, tuple.Item2, tuple.Item3);
+		}
+
+		public static IWatchable<(T1, T2, T3, T4)> WatchMany<T1, T2, T3, T4>(this (IWatchable<T1>, IWatchable<T2>, IWatchable<T3>, IWatchable<T4>) tuple)
+		{
+			return new WatchableTuple<T1, T2, T3, T4>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
 		}
 
 		public static IWatchableEnumerable<T> ToWatchableEnumerable<T>(this IWatchable<IEnumerable<T>> watchable)

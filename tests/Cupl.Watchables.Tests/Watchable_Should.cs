@@ -156,14 +156,17 @@ public class Watchable_Should
 	{
 		WatchableMutable<int> watchable1 = new(0);
 		WatchableMutable<string> watchable2 = new("ABC");
+		WatchableMutable<double> watchable3 = new(1.5);
+		WatchableMutable<string> watchable4 = new("");
 		var ran = new Mutable<bool>(false);
 
-		var watchableTuple = (watchable1, watchable2).WatchMany();
-		watchableTuple.ValueChanged +=
+		(watchable1, watchable2, watchable3, watchable4).WatchMany().ValueChanged +=
 			tuple =>
 			{
 				Assert.That(tuple.Item1, Is.EqualTo(watchable1.Value));
 				Assert.That(tuple.Item2, Is.EqualTo(watchable2.Value));
+				Assert.That(tuple.Item3, Is.EqualTo(watchable3.Value));
+				Assert.That(tuple.Item4, Is.EqualTo(watchable4.Value));
 				ran.Value = true;
 			};
 
@@ -172,6 +175,14 @@ public class Watchable_Should
 		ran.Value = false;
 
 		watchable2.Value = "xyz";
+		Assert.That(ran.Value);
+		ran.Value = false;
+
+		watchable3.Value = 1.2345;
+		Assert.That(ran.Value);
+		ran.Value = false;
+
+		watchable4.Value = "something";
 		Assert.That(ran.Value);
 		ran.Value = false;
 	}
