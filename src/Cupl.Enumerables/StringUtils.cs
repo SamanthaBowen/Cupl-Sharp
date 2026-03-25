@@ -27,24 +27,104 @@ namespace Cupl.Enumerables
 			return (0 <= index) ? index : (int?)null;
 		}
 
+		public static bool TryRemovePrefix(this string str, string prefix, out string result)
+		{
+			if (str.StartsWith(prefix))
+			{
+				result = str[prefix.Length..];
+				return true;
+			}
+			else
+			{
+				result = str;
+				return false;
+			}
+		}
+
+		public static bool TryRemovePrefix(this string str, char prefix, out string result)
+		{
+			if (str.StartsWith(prefix))
+			{
+				result = str[1..];
+				return true;
+			}
+			else
+			{
+				result = str;
+				return false;
+			}
+		}
+
+		public static bool TryRemoveSuffix(this string str, string suffix, out string result)
+		{
+			if (str.EndsWith(suffix))
+			{
+				result = str[..^suffix.Length];
+				return true;
+			}
+			else
+			{
+				result = str;
+				return false;
+			}
+		}
+
+		public static bool TryRemoveSuffix(this string str, char suffix, out string result)
+		{
+			if (str.EndsWith(suffix))
+			{
+				result = str[..^1];
+				return true;
+			}
+			else
+			{
+				result = str;
+				return false;
+			}
+		}
+
 		public static string RemovePrefix(this string str, string prefix)
 		{
-			return str.StartsWith(prefix) ? str[prefix.Length..] : str;
+			str.TryRemovePrefix(prefix, out var result);
+			return result;
+		}
+
+		public static string RemovePrefix(this string str, char prefix)
+		{
+			str.TryRemovePrefix(prefix, out var result);
+			return result;
 		}
 
 		public static string? RemovePrefixOrNull(this string str, string prefix)
 		{
-			return str.StartsWith(prefix) ? str[prefix.Length..] : null;
+			return str.TryRemovePrefix(prefix, out var result) ? result : null;
+		}
+
+		public static string? RemovePrefixOrNull(this string str, char prefix)
+		{
+			return str.TryRemovePrefix(prefix, out var result) ? result : null;
 		}
 
 		public static string RemoveSuffix(this string str, string suffix)
 		{
-			return str.EndsWith(suffix) ? str[..^suffix.Length] : str;
+			str.TryRemoveSuffix(suffix, out var result);
+			return result;
+		}
+
+		public static string RemoveSuffix(this string str, char suffix)
+		{
+			str.TryRemoveSuffix(suffix, out var result);
+			return result;
 		}
 
 		public static string? RemoveSuffixOrNull(this string str, string suffix)
 		{
-			return str.EndsWith(suffix) ? str[..^suffix.Length] : null;
+			return str.TryRemoveSuffix(suffix, out var result) ? result : null;
+		}
+
+		public static string? RemoveSuffixOrNull(this string str, char suffix)
+		{
+			return str.TryRemoveSuffix(suffix, out var result) ? result : null;
 		}
 	}
 }
