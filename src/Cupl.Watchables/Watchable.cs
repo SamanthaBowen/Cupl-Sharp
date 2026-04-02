@@ -60,6 +60,38 @@ namespace Cupl.Watchables
 			return new WatchableTuple<T1, T2, T3, T4>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
 		}
 
+		public static IWatchable<(T1, T2, T3, T4, T5)> WatchMany<T1, T2, T3, T4, T5>
+		(
+			this (IWatchable<T1>, IWatchable<T2>, IWatchable<T3>, IWatchable<T4>, IWatchable<T5>) tuple
+		)
+		{
+			return new WatchableTuple<T1, T2, T3, T4, T5>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5);
+		}
+
+		public static IWatchable<(T1, T2, T3, T4, T5, T6)> WatchMany<T1, T2, T3, T4, T5, T6>
+		(
+			this (IWatchable<T1>, IWatchable<T2>, IWatchable<T3>, IWatchable<T4>, IWatchable<T5>, IWatchable<T6>) tuple
+		)
+		{
+			return
+				new WatchableTuple<T1, T2, T3, T4, T5, T6>
+				(
+					tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, tuple.Item6
+				);
+		}
+
+		public static IWatchable<(T1, T2, T3, T4, T5, T6, T7)> WatchMany<T1, T2, T3, T4, T5, T6, T7>
+		(
+			this (IWatchable<T1>, IWatchable<T2>, IWatchable<T3>, IWatchable<T4>, IWatchable<T5>, IWatchable<T6>, IWatchable<T7>) tuple
+		)
+		{
+			return
+				new WatchableTuple<T1, T2, T3, T4, T5, T6, T7>
+				(
+					tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, tuple.Item6, tuple.Item7
+				);
+		}
+
 		public static IWatchableEnumerable<T> ToWatchableEnumerable<T>(this IWatchable<IEnumerable<T>> watchable)
 		{
 			if (watchable is IWatchableEnumerable<T> watchableEnumerable)
