@@ -59,7 +59,12 @@ namespace Cupl.Watchables.Collections
 
 		public int Count => inner.Count;
 		public bool IsReadOnly => false;
-		public int Capacity => inner.Capacity;
+
+		public int Capacity
+		{
+			get => inner.Capacity;
+			set => inner.Capacity = value;
+		}
 
 		IEnumerable<T> IWatchable<IEnumerable<T>>.Value => inner;
 
@@ -83,7 +88,9 @@ namespace Cupl.Watchables.Collections
 
 		public bool Contains(T item) => inner.Contains(item);
 		public void CopyTo(T[] array, int arrayIndex) => inner.CopyTo(array, arrayIndex);
+		public int EnsureCapacity(int capacity) => inner.Capacity;
 		public int IndexOf(T item) => inner.IndexOf(item);
+		public void TrimExcess() => inner.TrimExcess();
 
 		public void Add(T item)
 		{
@@ -145,6 +152,22 @@ namespace Cupl.Watchables.Collections
 			}
 			else
 				inner.Insert(index, item);
+
+			valueChanged?.Invoke(inner);
+		}
+
+		public void InsertRange(int index, ICollection<T> collection)
+		{
+			var valueChanged = ValueChanged;
+
+			if (ElementsChanged is Action<ElementsChangedEventArgs> elementsChanged)
+			{
+				var items = collection.ToArray();
+				inner.InsertRange(index, items);
+				elementsChanged?.Invoke(new ElementsChangedEventArgs(index, new T[0], index, items));
+			}
+			else
+				inner.InsertRange(index, collection);
 
 			valueChanged?.Invoke(inner);
 		}
