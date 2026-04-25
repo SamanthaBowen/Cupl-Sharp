@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Cupl.Watchables.Collections;
 
 namespace Cupl.Watchables
 {
