@@ -117,7 +117,7 @@ namespace Cupl.Watchables.Collections
 		int ICollection<T>.Count => Length;
 		int IReadOnlyCollection<T>.Count => Length;
 
-		public bool IsReadOnly => false;
+		bool ICollection<T>.IsReadOnly => false;
 
 		IEnumerable<T> IWatchable<IEnumerable<T>>.Value => inner;
 

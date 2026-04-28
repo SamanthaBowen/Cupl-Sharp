@@ -29,7 +29,7 @@ namespace Cupl.Watchables.Collections
 		public event Action<IEnumerable<T>>? ValueChanged;
 		private event Action<ElementsChangedEventArgs>? ElementsChanged;
 
-		public event NotifyCollectionChangedEventHandler CollectionChanged
+		public event NotifyCollectionChangedEventHandler? CollectionChanged
 		{
 			add => ElementsChanged += GetElementsChangedHandler(value);
 			remove => ElementsChanged -= GetElementsChangedHandler(value);
@@ -58,7 +58,8 @@ namespace Cupl.Watchables.Collections
 		}
 
 		public int Count => inner.Count;
-		public bool IsReadOnly => false;
+
+		bool ICollection<T>.IsReadOnly => false;
 
 		public int Capacity
 		{
