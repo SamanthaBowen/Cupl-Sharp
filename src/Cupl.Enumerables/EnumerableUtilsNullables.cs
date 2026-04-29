@@ -6,6 +6,9 @@ namespace Cupl.Enumerables
 {
 	public static partial class EnumerableUtils
 	{
+		private static IEnumerable<T>? NotEmptyOrNull<T>(this IEnumerable<T> source) =>
+			source.Any() ? source : null;
+
 		public static T? ElementAtOrNull<T>(this IEnumerable<T> source, int index)
 			where T : struct
 		{
@@ -37,38 +40,66 @@ namespace Cupl.Enumerables
 		}
 
 		public static decimal? MaxOrNull(this IEnumerable<decimal> source) =>
-			source.Max(x => new decimal?(x));
+			source.NotEmptyOrNull()?.Max();
 		public static double? MaxOrNull(this IEnumerable<double> source) =>
-			source.Max(x => new double?(x));
+			source.NotEmptyOrNull()?.Max();
 		public static int? MaxOrNull(this IEnumerable<int> source) =>
-			source.Max(x => new int?(x));
+			source.NotEmptyOrNull()?.Max();
 		public static long? MaxOrNull(this IEnumerable<long> source) =>
-			source.Max(x => new long?(x));
+			source.NotEmptyOrNull()?.Max();
 		public static float? MaxOrNull(this IEnumerable<float> source) =>
-			source.Max(x => new float?(x));
+			source.NotEmptyOrNull()?.Max();
 
 		public static T? MaxOrNull<T>(this IEnumerable<T> source)
 			where T : struct
 		{
-			return source.Max(x => new T?(x));
+			return source.NotEmptyOrNull()?.Max();
+		}
+
+		public static TResult? MaxOrNull<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
+			where TResult : struct
+		{
+			return source.NotEmptyOrNull()?.Max(selector);
 		}
 
 		public static decimal? MinOrNull(this IEnumerable<decimal> source) =>
-			source.Min(x => new decimal?(x));
+			source.NotEmptyOrNull()?.Min();
 		public static double? MinOrNull(this IEnumerable<double> source) =>
-			source.Min(x => new double?(x));
+			source.NotEmptyOrNull()?.Min();
 		public static int? MinOrNull(this IEnumerable<int> source) =>
-			source.Min(x => new int?(x));
+			source.NotEmptyOrNull()?.Min();
 		public static long? MinOrNull(this IEnumerable<long> source) =>
-			source.Min(x => new long?(x));
+			source.NotEmptyOrNull()?.Min();
 		public static float? MinOrNull(this IEnumerable<float> source) =>
-			source.Min(x => new float?(x));
+			source.NotEmptyOrNull()?.Min();
 
 		public static T? MinOrNull<T>(this IEnumerable<T> source)
 			where T : struct
 		{
-			return source.Min(x => new T?(x));
+			return source.NotEmptyOrNull()?.Min();
 		}
+
+		public static TResult? MinOrNull<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
+			where TResult : struct
+		{
+			return source.NotEmptyOrNull()?.Min(selector);
+		}
+
+		#if !NETSTANDARD2_1
+
+		public static TSource? MaxByOrNull<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+			where TSource : struct
+		{
+			return source.NotEmptyOrNull()?.MaxBy(keySelector);
+		}
+
+		public static TSource? MinByOrNull<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+			where TSource : struct
+		{
+			return source.NotEmptyOrNull()?.MinBy(keySelector);
+		}
+
+		#endif
 
 		public static T? SingleOrNull<T>(this IEnumerable<T> source)
 			where T : struct
