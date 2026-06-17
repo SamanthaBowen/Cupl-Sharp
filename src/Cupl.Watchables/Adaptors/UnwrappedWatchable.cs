@@ -34,7 +34,7 @@ namespace Cupl.Watchables
 			}
 		}
 
-		private IWatchable<IWatchable<T>> outer;
+		private readonly IWatchable<IWatchable<T>> outer;
 		private IWatchable<T>? inner;
 
 		public T Value => (inner ?? outer.Value).Value;

@@ -44,6 +44,19 @@ public class Watchable_Should
 	{
 	}
 
+	private void TestUnsubscribe<T>(IWatchable<T> watchable)
+	{
+		var ran = new Mutable<bool>(false);
+		Action<T> valueChangedHandler =
+			x =>
+			{
+				Assert.Fail("Removed event handler should not be run");
+			};
+
+		watchable.ValueChanged += valueChangedHandler;
+		watchable.ValueChanged -= valueChangedHandler;
+	}
+
 	[Test]
 	public void TestMap()
 	{
@@ -52,6 +65,7 @@ public class Watchable_Should
 
 		var mappedToString = mutable.Map(i => i.ToString());
 
+		TestUnsubscribe(mappedToString);
 		mappedToString.ValueChanged +=
 			str =>
 			{
@@ -74,6 +88,7 @@ public class Watchable_Should
 
 		var unwrapped = mutableWatchable.Unwrap();
 
+		TestUnsubscribe(unwrapped);
 		unwrapped.ValueChanged +=
 			i =>
 			{
@@ -115,6 +130,7 @@ public class Watchable_Should
 		var watchableEnumerable = mutableEnumerable.ToWatchableEnumerable().WatchMany();
 		var mutableEnumerableRan = new Mutable<bool>(false);
 
+		TestUnsubscribe(watchableFirst3);
 		watchableFirst3.ValueChanged +=
 			s =>
 			{
@@ -122,6 +138,7 @@ public class Watchable_Should
 				watchableFirst3Ran.Value = true;
 			};
 		
+		TestUnsubscribe(watchableEnumerable);
 		watchableEnumerable.ValueChanged +=
 			s =>
 			{
@@ -160,7 +177,9 @@ public class Watchable_Should
 		WatchableMutable<string> watchable4 = new("");
 		var ran = new Mutable<bool>(false);
 
-		(watchable1, watchable2, watchable3, watchable4).WatchMany().ValueChanged +=
+		var watchMany = (watchable1, watchable2, watchable3, watchable4).WatchMany();
+		TestUnsubscribe(watchMany);
+		watchMany.ValueChanged +=
 			tuple =>
 			{
 				Assert.That(tuple.Item1, Is.EqualTo(watchable1.Value));

@@ -7,40 +7,54 @@ using System.Linq;
 
 namespace Cupl.Watchables
 {
-	internal readonly struct WatchableTuple<T1, T2> :
+	internal class WatchableTuple<T1, T2> :
 		IWatchable<(T1, T2)>, IWatchable<Tuple<T1, T2>>
 	{
-		private readonly Action<(T1, T2)> GetValueChangedHandler(Action<Tuple<T1, T2>>? handler)
-		{
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return tuple => handler?.Invoke(tuple.ToTuple());
-		}
-
+		private Action<(T1, T2)>? valueChanged;
 		public event Action<(T1, T2)>? ValueChanged
 		{
 			add
 			{
-				Watchable1.ValueChanged += GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged += GetElementValueChangedHandler<T2>(value);
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged += HandleElement1ValueChanged;
+					Watchable2.ValueChanged += HandleElement2ValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				Watchable1.ValueChanged -= GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged -= GetElementValueChangedHandler<T2>(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged -= HandleElement1ValueChanged;
+					Watchable2.ValueChanged -= HandleElement2ValueChanged;
+				}
 			}
 		}
 
+		private Action<Tuple<T1, T2>>? tupleValueChanged;
 		event Action<Tuple<T1, T2>>? IWatchable<Tuple<T1, T2>>.ValueChanged
 		{
-			add => ValueChanged += GetValueChangedHandler(value);
-			remove => ValueChanged -= GetValueChangedHandler(value);
+			add
+			{
+				if (tupleValueChanged == null)
+					ValueChanged += OnTupleValueChanged;
+				tupleValueChanged += value;
+			}
+			remove
+			{
+				tupleValueChanged -= value;
+				if (tupleValueChanged == null)
+					ValueChanged -= OnTupleValueChanged;
+			}
 		}
 
-		public readonly IWatchable<T1> Watchable1 { get; }
-		public readonly IWatchable<T2> Watchable2 { get; }
+		public IWatchable<T1> Watchable1 { get; }
+		public IWatchable<T2> Watchable2 { get; }
 
-		public readonly (T1, T2) Value => (Watchable1.Value, Watchable2.Value);
-		readonly Tuple<T1, T2> IWatchable<Tuple<T1, T2>>.Value => Value.ToTuple();
+		public (T1, T2) Value => (Watchable1.Value, Watchable2.Value);
+		Tuple<T1, T2> IWatchable<Tuple<T1, T2>>.Value => Value.ToTuple();
 
 		public WatchableTuple(IWatchable<T1> watchable1, IWatchable<T2> watchable2)
 		{
@@ -48,53 +62,63 @@ namespace Cupl.Watchables
 			Watchable2 = watchable2;
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler<T>(Action<(T1, T2)>? handler)
-		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
+		private void OnTupleValueChanged((T1, T2) value) => tupleValueChanged?.Invoke(value.ToTuple());
 
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
-		}
+		private void HandleElement1ValueChanged(T1 _) => valueChanged?.Invoke(Value);
+		private void HandleElement2ValueChanged(T2 _) => valueChanged?.Invoke(Value);
 	}
 
-	internal readonly struct WatchableTuple<T1, T2, T3> :
+	internal class WatchableTuple<T1, T2, T3> :
 		IWatchable<(T1, T2, T3)>, IWatchable<Tuple<T1, T2, T3>>
 	{
-		private readonly Action<(T1, T2, T3)> GetValueChangedHandler(Action<Tuple<T1, T2, T3>>? handler)
-		{
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return tuple => handler?.Invoke(tuple.ToTuple());
-		}
-
+		private Action<(T1, T2, T3)>? valueChanged;
 		public event Action<(T1, T2, T3)>? ValueChanged
 		{
 			add
 			{
-				Watchable1.ValueChanged += GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged += GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged += GetElementValueChangedHandler<T3>(value);
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged += HandleElement1ValueChanged;
+					Watchable2.ValueChanged += HandleElement2ValueChanged;
+					Watchable3.ValueChanged += HandleElement3ValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				Watchable1.ValueChanged -= GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged -= GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged -= GetElementValueChangedHandler<T3>(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged -= HandleElement1ValueChanged;
+					Watchable2.ValueChanged -= HandleElement2ValueChanged;
+					Watchable3.ValueChanged -= HandleElement3ValueChanged;
+				}
 			}
 		}
 
+		private Action<Tuple<T1, T2, T3>>? tupleValueChanged;
 		event Action<Tuple<T1, T2, T3>>? IWatchable<Tuple<T1, T2, T3>>.ValueChanged
 		{
-			add => ValueChanged += GetValueChangedHandler(value);
-			remove => ValueChanged -= GetValueChangedHandler(value);
+			add
+			{
+				if (tupleValueChanged == null)
+					ValueChanged += OnTupleValueChanged;
+				tupleValueChanged += value;
+			}
+			remove
+			{
+				tupleValueChanged -= value;
+				if (tupleValueChanged == null)
+					ValueChanged -= OnTupleValueChanged;
+			}
 		}
 
-		public readonly IWatchable<T1> Watchable1 { get; }
-		public readonly IWatchable<T2> Watchable2 { get; }
-		public readonly IWatchable<T3> Watchable3 { get; }
+		public IWatchable<T1> Watchable1 { get; }
+		public IWatchable<T2> Watchable2 { get; }
+		public IWatchable<T3> Watchable3 { get; }
 
-		public readonly (T1, T2, T3) Value => (Watchable1.Value, Watchable2.Value, Watchable3.Value);
-		readonly Tuple<T1, T2, T3> IWatchable<Tuple<T1, T2, T3>>.Value => Value.ToTuple();
+		public (T1, T2, T3) Value => (Watchable1.Value, Watchable2.Value, Watchable3.Value);
+		Tuple<T1, T2, T3> IWatchable<Tuple<T1, T2, T3>>.Value => Value.ToTuple();
 
 		public WatchableTuple(IWatchable<T1> watchable1, IWatchable<T2> watchable2, IWatchable<T3> watchable3)
 		{
@@ -103,56 +127,67 @@ namespace Cupl.Watchables
 			Watchable3 = watchable3;
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler<T>(Action<(T1, T2, T3)>? handler)
-		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
+		private void OnTupleValueChanged((T1, T2, T3) value) => tupleValueChanged?.Invoke(value.ToTuple());
 
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
-		}
+		private void HandleElement1ValueChanged(T1 _) => valueChanged?.Invoke(Value);
+		private void HandleElement2ValueChanged(T2 _) => valueChanged?.Invoke(Value);
+		private void HandleElement3ValueChanged(T3 _) => valueChanged?.Invoke(Value);
 	}
 
-	internal readonly struct WatchableTuple<T1, T2, T3, T4> :
+	internal class WatchableTuple<T1, T2, T3, T4> :
 		IWatchable<(T1, T2, T3, T4)>, IWatchable<Tuple<T1, T2, T3, T4>>
 	{
-		private readonly Action<(T1, T2, T3, T4)> GetValueChangedHandler(Action<Tuple<T1, T2, T3, T4>>? handler)
-		{
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return tuple => handler?.Invoke(tuple.ToTuple());
-		}
-
+		private Action<(T1, T2, T3, T4)>? valueChanged;
 		public event Action<(T1, T2, T3, T4)>? ValueChanged
 		{
 			add
 			{
-				Watchable1.ValueChanged += GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged += GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged += GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged += GetElementValueChangedHandler<T4>(value);
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged += HandleElement1ValueChanged;
+					Watchable2.ValueChanged += HandleElement2ValueChanged;
+					Watchable3.ValueChanged += HandleElement3ValueChanged;
+					Watchable4.ValueChanged += HandleElement4ValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				Watchable1.ValueChanged -= GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged -= GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged -= GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged -= GetElementValueChangedHandler<T4>(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged -= HandleElement1ValueChanged;
+					Watchable2.ValueChanged -= HandleElement2ValueChanged;
+					Watchable3.ValueChanged -= HandleElement3ValueChanged;
+					Watchable4.ValueChanged -= HandleElement4ValueChanged;
+				}
 			}
 		}
 
+		private Action<Tuple<T1, T2, T3, T4>>? tupleValueChanged;
 		event Action<Tuple<T1, T2, T3, T4>>? IWatchable<Tuple<T1, T2, T3, T4>>.ValueChanged
 		{
-			add => ValueChanged += GetValueChangedHandler(value);
-			remove => ValueChanged -= GetValueChangedHandler(value);
+			add
+			{
+				if (tupleValueChanged == null)
+					ValueChanged += OnTupleValueChanged;
+				tupleValueChanged += value;
+			}
+			remove
+			{
+				tupleValueChanged -= value;
+				if (tupleValueChanged == null)
+					ValueChanged -= OnTupleValueChanged;
+			}
 		}
 
-		public readonly IWatchable<T1> Watchable1 { get; }
-		public readonly IWatchable<T2> Watchable2 { get; }
-		public readonly IWatchable<T3> Watchable3 { get; }
-		public readonly IWatchable<T4> Watchable4 { get; }
+		public IWatchable<T1> Watchable1 { get; }
+		public IWatchable<T2> Watchable2 { get; }
+		public IWatchable<T3> Watchable3 { get; }
+		public IWatchable<T4> Watchable4 { get; }
 
-		public readonly (T1, T2, T3, T4) Value => (Watchable1.Value, Watchable2.Value, Watchable3.Value, Watchable4.Value);
-		readonly Tuple<T1, T2, T3, T4> IWatchable<Tuple<T1, T2, T3, T4>>.Value => Value.ToTuple();
+		public (T1, T2, T3, T4) Value => (Watchable1.Value, Watchable2.Value, Watchable3.Value, Watchable4.Value);
+		Tuple<T1, T2, T3, T4> IWatchable<Tuple<T1, T2, T3, T4>>.Value => Value.ToTuple();
 
 		public WatchableTuple(IWatchable<T1> watchable1, IWatchable<T2> watchable2, IWatchable<T3> watchable3, IWatchable<T4> watchable4)
 		{
@@ -162,60 +197,72 @@ namespace Cupl.Watchables
 			Watchable4 = watchable4;
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler<T>(Action<(T1, T2, T3, T4)>? handler)
-		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
+		private void OnTupleValueChanged((T1, T2, T3, T4) value) => tupleValueChanged?.Invoke(value.ToTuple());
 
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
-		}
+		private void HandleElement1ValueChanged(T1 _) => valueChanged?.Invoke(Value);
+		private void HandleElement2ValueChanged(T2 _) => valueChanged?.Invoke(Value);
+		private void HandleElement3ValueChanged(T3 _) => valueChanged?.Invoke(Value);
+		private void HandleElement4ValueChanged(T4 _) => valueChanged?.Invoke(Value);
 	}
 
-	internal readonly struct WatchableTuple<T1, T2, T3, T4, T5> :
+	internal class WatchableTuple<T1, T2, T3, T4, T5> :
 		IWatchable<(T1, T2, T3, T4, T5)>, IWatchable<Tuple<T1, T2, T3, T4, T5>>
 	{
-		private readonly Action<(T1, T2, T3, T4, T5)> GetValueChangedHandler(Action<Tuple<T1, T2, T3, T4, T5>>? handler)
-		{
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return tuple => handler?.Invoke(tuple.ToTuple());
-		}
-
+		private Action<(T1, T2, T3, T4, T5)>? valueChanged;
 		public event Action<(T1, T2, T3, T4, T5)>? ValueChanged
 		{
 			add
 			{
-				Watchable1.ValueChanged += GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged += GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged += GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged += GetElementValueChangedHandler<T4>(value);
-				Watchable5.ValueChanged += GetElementValueChangedHandler<T5>(value);
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged += HandleElement1ValueChanged;
+					Watchable2.ValueChanged += HandleElement2ValueChanged;
+					Watchable3.ValueChanged += HandleElement3ValueChanged;
+					Watchable4.ValueChanged += HandleElement4ValueChanged;
+					Watchable5.ValueChanged += HandleElement5ValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				Watchable1.ValueChanged -= GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged -= GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged -= GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged -= GetElementValueChangedHandler<T4>(value);
-				Watchable5.ValueChanged -= GetElementValueChangedHandler<T5>(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged -= HandleElement1ValueChanged;
+					Watchable2.ValueChanged -= HandleElement2ValueChanged;
+					Watchable3.ValueChanged -= HandleElement3ValueChanged;
+					Watchable4.ValueChanged -= HandleElement4ValueChanged;
+					Watchable5.ValueChanged -= HandleElement5ValueChanged;
+				}
 			}
 		}
 
+		private Action<Tuple<T1, T2, T3, T4, T5>>? tupleValueChanged;
 		event Action<Tuple<T1, T2, T3, T4, T5>>? IWatchable<Tuple<T1, T2, T3, T4, T5>>.ValueChanged
 		{
-			add => ValueChanged += GetValueChangedHandler(value);
-			remove => ValueChanged -= GetValueChangedHandler(value);
+			add
+			{
+				if (tupleValueChanged == null)
+					ValueChanged += OnTupleValueChanged;
+				tupleValueChanged += value;
+			}
+			remove
+			{
+				tupleValueChanged -= value;
+				if (tupleValueChanged == null)
+					ValueChanged -= OnTupleValueChanged;
+			}
 		}
 
-		public readonly IWatchable<T1> Watchable1 { get; }
-		public readonly IWatchable<T2> Watchable2 { get; }
-		public readonly IWatchable<T3> Watchable3 { get; }
-		public readonly IWatchable<T4> Watchable4 { get; }
-		public readonly IWatchable<T5> Watchable5 { get; }
+		public IWatchable<T1> Watchable1 { get; }
+		public IWatchable<T2> Watchable2 { get; }
+		public IWatchable<T3> Watchable3 { get; }
+		public IWatchable<T4> Watchable4 { get; }
+		public IWatchable<T5> Watchable5 { get; }
 
-		public readonly (T1, T2, T3, T4, T5) Value =>
+		public (T1, T2, T3, T4, T5) Value =>
 			(Watchable1.Value, Watchable2.Value, Watchable3.Value, Watchable4.Value, Watchable5.Value);
-		readonly Tuple<T1, T2, T3, T4, T5> IWatchable<Tuple<T1, T2, T3, T4, T5>>.Value => Value.ToTuple();
+		Tuple<T1, T2, T3, T4, T5> IWatchable<Tuple<T1, T2, T3, T4, T5>>.Value => Value.ToTuple();
 
 		public WatchableTuple
 		(
@@ -230,63 +277,76 @@ namespace Cupl.Watchables
 			Watchable5 = watchable5;
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler<T>(Action<(T1, T2, T3, T4, T5)>? handler)
-		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
+		private void OnTupleValueChanged((T1, T2, T3, T4, T5) value) => tupleValueChanged?.Invoke(value.ToTuple());
 
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
-		}
+		private void HandleElement1ValueChanged(T1 _) => valueChanged?.Invoke(Value);
+		private void HandleElement2ValueChanged(T2 _) => valueChanged?.Invoke(Value);
+		private void HandleElement3ValueChanged(T3 _) => valueChanged?.Invoke(Value);
+		private void HandleElement4ValueChanged(T4 _) => valueChanged?.Invoke(Value);
+		private void HandleElement5ValueChanged(T5 _) => valueChanged?.Invoke(Value);
 	}
 
-	internal readonly struct WatchableTuple<T1, T2, T3, T4, T5, T6> :
+	internal class WatchableTuple<T1, T2, T3, T4, T5, T6> :
 		IWatchable<(T1, T2, T3, T4, T5, T6)>, IWatchable<Tuple<T1, T2, T3, T4, T5, T6>>
 	{
-		private readonly Action<(T1, T2, T3, T4, T5, T6)> GetValueChangedHandler(Action<Tuple<T1, T2, T3, T4, T5, T6>>? handler)
-		{
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return tuple => handler?.Invoke(tuple.ToTuple());
-		}
-
+		private Action<(T1, T2, T3, T4, T5, T6)>? valueChanged;
 		public event Action<(T1, T2, T3, T4, T5, T6)>? ValueChanged
 		{
 			add
 			{
-				Watchable1.ValueChanged += GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged += GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged += GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged += GetElementValueChangedHandler<T4>(value);
-				Watchable5.ValueChanged += GetElementValueChangedHandler<T5>(value);
-				Watchable6.ValueChanged += GetElementValueChangedHandler<T6>(value);
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged += HandleElement1ValueChanged;
+					Watchable2.ValueChanged += HandleElement2ValueChanged;
+					Watchable3.ValueChanged += HandleElement3ValueChanged;
+					Watchable4.ValueChanged += HandleElement4ValueChanged;
+					Watchable5.ValueChanged += HandleElement5ValueChanged;
+					Watchable6.ValueChanged += HandleElement6ValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				Watchable1.ValueChanged -= GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged -= GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged -= GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged -= GetElementValueChangedHandler<T4>(value);
-				Watchable5.ValueChanged -= GetElementValueChangedHandler<T5>(value);
-				Watchable6.ValueChanged -= GetElementValueChangedHandler<T6>(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged -= HandleElement1ValueChanged;
+					Watchable2.ValueChanged -= HandleElement2ValueChanged;
+					Watchable3.ValueChanged -= HandleElement3ValueChanged;
+					Watchable4.ValueChanged -= HandleElement4ValueChanged;
+					Watchable5.ValueChanged -= HandleElement5ValueChanged;
+					Watchable6.ValueChanged -= HandleElement6ValueChanged;
+				}
 			}
 		}
 
+		private Action<Tuple<T1, T2, T3, T4, T5, T6>>? tupleValueChanged;
 		event Action<Tuple<T1, T2, T3, T4, T5, T6>>? IWatchable<Tuple<T1, T2, T3, T4, T5, T6>>.ValueChanged
 		{
-			add => ValueChanged += GetValueChangedHandler(value);
-			remove => ValueChanged -= GetValueChangedHandler(value);
+			add
+			{
+				if (tupleValueChanged == null)
+					ValueChanged += OnTupleValueChanged;
+				tupleValueChanged += value;
+			}
+			remove
+			{
+				tupleValueChanged -= value;
+				if (tupleValueChanged == null)
+					ValueChanged -= OnTupleValueChanged;
+			}
 		}
 
-		public readonly IWatchable<T1> Watchable1 { get; }
-		public readonly IWatchable<T2> Watchable2 { get; }
-		public readonly IWatchable<T3> Watchable3 { get; }
-		public readonly IWatchable<T4> Watchable4 { get; }
-		public readonly IWatchable<T5> Watchable5 { get; }
-		public readonly IWatchable<T6> Watchable6 { get; }
+		public IWatchable<T1> Watchable1 { get; }
+		public IWatchable<T2> Watchable2 { get; }
+		public IWatchable<T3> Watchable3 { get; }
+		public IWatchable<T4> Watchable4 { get; }
+		public IWatchable<T5> Watchable5 { get; }
+		public IWatchable<T6> Watchable6 { get; }
 
-		public readonly (T1, T2, T3, T4, T5, T6) Value =>
+		public (T1, T2, T3, T4, T5, T6) Value =>
 			(Watchable1.Value, Watchable2.Value, Watchable3.Value, Watchable4.Value, Watchable5.Value, Watchable6.Value);
-		readonly Tuple<T1, T2, T3, T4, T5, T6> IWatchable<Tuple<T1, T2, T3, T4, T5, T6>>.Value => Value.ToTuple();
+		Tuple<T1, T2, T3, T4, T5, T6> IWatchable<Tuple<T1, T2, T3, T4, T5, T6>>.Value => Value.ToTuple();
 
 		public WatchableTuple
 		(
@@ -302,66 +362,80 @@ namespace Cupl.Watchables
 			Watchable6 = watchable6;
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler<T>(Action<(T1, T2, T3, T4, T5, T6)>? handler)
-		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
+		private void OnTupleValueChanged((T1, T2, T3, T4, T5, T6) value) => tupleValueChanged?.Invoke(value.ToTuple());
 
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
-		}
+		private void HandleElement1ValueChanged(T1 _) => valueChanged?.Invoke(Value);
+		private void HandleElement2ValueChanged(T2 _) => valueChanged?.Invoke(Value);
+		private void HandleElement3ValueChanged(T3 _) => valueChanged?.Invoke(Value);
+		private void HandleElement4ValueChanged(T4 _) => valueChanged?.Invoke(Value);
+		private void HandleElement5ValueChanged(T5 _) => valueChanged?.Invoke(Value);
+		private void HandleElement6ValueChanged(T6 _) => valueChanged?.Invoke(Value);
 	}
 
-	internal readonly struct WatchableTuple<T1, T2, T3, T4, T5, T6, T7> :
+	internal class WatchableTuple<T1, T2, T3, T4, T5, T6, T7> :
 		IWatchable<(T1, T2, T3, T4, T5, T6, T7)>, IWatchable<Tuple<T1, T2, T3, T4, T5, T6, T7>>
 	{
-		private readonly Action<(T1, T2, T3, T4, T5, T6, T7)> GetValueChangedHandler(Action<Tuple<T1, T2, T3, T4, T5, T6, T7>>? handler)
-		{
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return tuple => handler?.Invoke(tuple.ToTuple());
-		}
-
+		private Action<(T1, T2, T3, T4, T5, T6, T7)>? valueChanged;
 		public event Action<(T1, T2, T3, T4, T5, T6, T7)>? ValueChanged
 		{
 			add
 			{
-				Watchable1.ValueChanged += GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged += GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged += GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged += GetElementValueChangedHandler<T4>(value);
-				Watchable5.ValueChanged += GetElementValueChangedHandler<T5>(value);
-				Watchable6.ValueChanged += GetElementValueChangedHandler<T6>(value);
-				Watchable7.ValueChanged += GetElementValueChangedHandler<T7>(value);
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged += HandleElement1ValueChanged;
+					Watchable2.ValueChanged += HandleElement2ValueChanged;
+					Watchable3.ValueChanged += HandleElement3ValueChanged;
+					Watchable4.ValueChanged += HandleElement4ValueChanged;
+					Watchable5.ValueChanged += HandleElement5ValueChanged;
+					Watchable6.ValueChanged += HandleElement6ValueChanged;
+					Watchable7.ValueChanged += HandleElement7ValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				Watchable1.ValueChanged -= GetElementValueChangedHandler<T1>(value);
-				Watchable2.ValueChanged -= GetElementValueChangedHandler<T2>(value);
-				Watchable3.ValueChanged -= GetElementValueChangedHandler<T3>(value);
-				Watchable4.ValueChanged -= GetElementValueChangedHandler<T4>(value);
-				Watchable5.ValueChanged -= GetElementValueChangedHandler<T5>(value);
-				Watchable6.ValueChanged -= GetElementValueChangedHandler<T6>(value);
-				Watchable7.ValueChanged -= GetElementValueChangedHandler<T7>(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					Watchable1.ValueChanged -= HandleElement1ValueChanged;
+					Watchable2.ValueChanged -= HandleElement2ValueChanged;
+					Watchable3.ValueChanged -= HandleElement3ValueChanged;
+					Watchable4.ValueChanged -= HandleElement4ValueChanged;
+					Watchable5.ValueChanged -= HandleElement5ValueChanged;
+					Watchable6.ValueChanged -= HandleElement6ValueChanged;
+					Watchable7.ValueChanged -= HandleElement7ValueChanged;
+				}
 			}
 		}
 
+		private Action<Tuple<T1, T2, T3, T4, T5, T6, T7>>? tupleValueChanged;
 		event Action<Tuple<T1, T2, T3, T4, T5, T6, T7>>? IWatchable<Tuple<T1, T2, T3, T4, T5, T6, T7>>.ValueChanged
 		{
-			add => ValueChanged += GetValueChangedHandler(value);
-			remove => ValueChanged -= GetValueChangedHandler(value);
+			add
+			{
+				if (tupleValueChanged == null)
+					ValueChanged += OnTupleValueChanged;
+				tupleValueChanged += value;
+			}
+			remove
+			{
+				tupleValueChanged -= value;
+				if (tupleValueChanged == null)
+					ValueChanged -= OnTupleValueChanged;
+			}
 		}
 
-		public readonly IWatchable<T1> Watchable1 { get; }
-		public readonly IWatchable<T2> Watchable2 { get; }
-		public readonly IWatchable<T3> Watchable3 { get; }
-		public readonly IWatchable<T4> Watchable4 { get; }
-		public readonly IWatchable<T5> Watchable5 { get; }
-		public readonly IWatchable<T6> Watchable6 { get; }
-		public readonly IWatchable<T7> Watchable7 { get; }
+		public IWatchable<T1> Watchable1 { get; }
+		public IWatchable<T2> Watchable2 { get; }
+		public IWatchable<T3> Watchable3 { get; }
+		public IWatchable<T4> Watchable4 { get; }
+		public IWatchable<T5> Watchable5 { get; }
+		public IWatchable<T6> Watchable6 { get; }
+		public IWatchable<T7> Watchable7 { get; }
 
-		public readonly (T1, T2, T3, T4, T5, T6, T7) Value =>
+		public (T1, T2, T3, T4, T5, T6, T7) Value =>
 			(Watchable1.Value, Watchable2.Value, Watchable3.Value, Watchable4.Value, Watchable5.Value, Watchable6.Value, Watchable7.Value);
-		readonly Tuple<T1, T2, T3, T4, T5, T6, T7> IWatchable<Tuple<T1, T2, T3, T4, T5, T6, T7>>.Value => Value.ToTuple();
+		Tuple<T1, T2, T3, T4, T5, T6, T7> IWatchable<Tuple<T1, T2, T3, T4, T5, T6, T7>>.Value => Value.ToTuple();
 
 		public WatchableTuple
 		(
@@ -378,13 +452,14 @@ namespace Cupl.Watchables
 			Watchable7 = watchable7;
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler<T>(Action<(T1, T2, T3, T4, T5, T6, T7)>? handler)
-		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
+		private void OnTupleValueChanged((T1, T2, T3, T4, T5, T6, T7) value) => tupleValueChanged?.Invoke(value.ToTuple());
 
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
-		}
+		private void HandleElement1ValueChanged(T1 _) => valueChanged?.Invoke(Value);
+		private void HandleElement2ValueChanged(T2 _) => valueChanged?.Invoke(Value);
+		private void HandleElement3ValueChanged(T3 _) => valueChanged?.Invoke(Value);
+		private void HandleElement4ValueChanged(T4 _) => valueChanged?.Invoke(Value);
+		private void HandleElement5ValueChanged(T5 _) => valueChanged?.Invoke(Value);
+		private void HandleElement6ValueChanged(T6 _) => valueChanged?.Invoke(Value);
+		private void HandleElement7ValueChanged(T7 _) => valueChanged?.Invoke(Value);
 	}
 }

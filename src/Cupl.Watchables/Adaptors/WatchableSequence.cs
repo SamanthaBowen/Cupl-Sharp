@@ -8,39 +8,44 @@ using Cupl.Watchables.Collections;
 
 namespace Cupl.Watchables
 {
-	internal readonly struct WatchableSequence<T> :
+	internal class WatchableSequence<T> :
 		IWatchableEnumerable<T>
 	{
+		private Action<IEnumerable<T>>? valueChanged;
 		public event Action<IEnumerable<T>>? ValueChanged
 		{
 			add
 			{
-				foreach (var watchable in watchables)
-					watchable.ValueChanged += GetElementValueChangedHandler(value);
+				if (valueChanged == null)
+				{
+					foreach (var watchable in watchables)
+						watchable.ValueChanged += HandleElementValueChanged;
+				}
+				valueChanged += value;
 			}
 			remove
 			{
-				foreach (var watchable in watchables)
-					watchable.ValueChanged += GetElementValueChangedHandler(value);
+				valueChanged -= value;
+				if (valueChanged == null)
+				{
+					foreach (var watchable in watchables)
+						watchable.ValueChanged -= HandleElementValueChanged;
+				}
 			}
 		}
 
 		private readonly IWatchable<T>[] watchables;
 
-		public readonly IEnumerable<T> Value => watchables.Select(w => w.Value);
+		public IEnumerable<T> Value => watchables.Select(w => w.Value);
 
 		public WatchableSequence(IEnumerable<IWatchable<T>> watchables)
 		{
 			this.watchables = watchables.ToArray();
 		}
 
-		private readonly Action<T> GetElementValueChangedHandler(Action<IEnumerable<T>>? handler)
+		private void HandleElementValueChanged(T _)
 		{
-			// Making a copy is okay because this is readonly.
-			var this_ = this;
-
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(this_.Value);
+			valueChanged?.Invoke(Value);
 		}
 
 		public IEnumerator<T> GetEnumerator() => Value.GetEnumerator();

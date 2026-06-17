@@ -4,13 +4,24 @@ using System;
 
 namespace Cupl.Watchables
 {
-	internal struct MappedWatchable<T, U> :
+	internal class MappedWatchable<T, U> :
 		IWatchable<U>
 	{
+		private Action<U>? valueChanged;
 		public event Action<U>? ValueChanged
 		{
-			add => source.ValueChanged += GetSourceValueChangedHandler(value);
-			remove => source.ValueChanged -= GetSourceValueChangedHandler(value);
+			add
+			{
+				if (valueChanged == null)
+					source.ValueChanged += HandleSourceValueChanged;
+				valueChanged += value;
+			}
+			remove
+			{
+				valueChanged -= value;
+				if (valueChanged == null)
+					source.ValueChanged -= HandleSourceValueChanged;
+			}
 		}
 
 		private readonly IWatchable<T> source;
@@ -24,12 +35,9 @@ namespace Cupl.Watchables
 			this.function = function;
 		}
 
-		private readonly Action<T> GetSourceValueChangedHandler(Action<U>? handler)
+		private void HandleSourceValueChanged(T sourceValue)
 		{
-			var function = this.function;
-
-			// By keeping the lambda here, it should be the same anonymous function each time this is called.
-			return s => handler?.Invoke(function(s));
+			valueChanged?.Invoke(function(sourceValue));
 		}
 	}
 }
