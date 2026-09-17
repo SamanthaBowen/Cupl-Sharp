@@ -13,6 +13,12 @@ namespace Cupl.Enumerables
 			return source.TryGetValue(key, out var value) ? value : (TValue?)null;
 		}
 
+		public static int? IndexOfOrNull<T>(this T[] source, T value)
+		{
+			var index = Array.IndexOf(source, value);
+			return (0 <= index) ? index : (int?)null;
+		}
+
 		public static int? IndexOfOrNull<T>(this IList<T> source, T value)
 		{
 			var index = source.IndexOf(value);
